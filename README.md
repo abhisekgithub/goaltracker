@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Tracker
 
-## Getting Started
+Next.js app with spend, goals, and todo tracking. Data is stored per user in **MongoDB**; access is protected with **email/password auth** (Auth.js / NextAuth v5).
 
-First, run the development server:
+## Features
+
+- **Spend Tracker** — Monthly budgets per category, daily spend logging, charts, remaining budget.
+- **Goal Tracker** — Goals with date ranges, daily repeatable actions, progress.
+- **Todo Tracker** — Tasks with optional due dates.
+
+## Setup
+
+1. Copy environment variables:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Set in `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Description |
+|----------|-------------|
+| `MONGODB_URI` | MongoDB connection string (e.g. [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)) |
+| `MONGODB_DB` | Database name (default: `goaltracker`) |
+| `AUTH_SECRET` | Random secret for JWT sessions (`openssl rand -base64 32`) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Install and run:
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000), **Register**, then use Spend / Goals / Todos.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Auth & API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Register** — `POST /api/register` (email, password, optional name)
+- **Sign in** — Auth.js credentials at `/api/auth/*`
+- **Data** — `GET` / `PUT /api/data` (requires session; stores tracker JSON per user)
 
-## Deploy on Vercel
+Protected routes: `/spend`, `/goals`, `/todos` (middleware redirects to `/login`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy to GCP (Cloud Run)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set environment variables on the Cloud Run service:
+
+- `MONGODB_URI`
+- `AUTH_SECRET`
+- `MONGODB_DB` (optional)
+
+```bash
+gcloud builds submit --config cloudbuild.yaml
+```
+
+Or run the Docker image locally (with env vars):
+
+```bash
+docker build -t goaltracker .
+docker run -p 8080:8080 \
+  -e MONGODB_URI="..." \
+  -e AUTH_SECRET="..." \
+  goaltracker
+```
+
+## Stack
+
+- Next.js 16, React 19, Tailwind CSS 4
+- NextAuth v5 (Auth.js) — JWT sessions, credentials provider
+- MongoDB Node driver
+- Recharts, date-fns
