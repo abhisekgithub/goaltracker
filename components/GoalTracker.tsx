@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -21,6 +21,14 @@ import {
   isDateInRange,
   shortDayLabel,
 } from "@/lib/dates";
+import {
+  applyGoalImport,
+  buildGoalExportPayload,
+  downloadGoalExport,
+  goalExportFilename,
+  parseGoalExportJson,
+  type GoalImportMode,
+} from "@/lib/goal-import-export";
 import type { ActionCompletion, Goal } from "@/lib/types";
 
 function isActionCompleted(
@@ -71,6 +79,12 @@ export function GoalTracker() {
   const [actionInput, setActionInput] = useState("");
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const [viewDate, setViewDate] = useState(formatDate(new Date()));
+  const [importMode, setImportMode] = useState<GoalImportMode>("merge");
+  const [importMessage, setImportMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedGoal =
     data.goals.find((g) => g.id === selectedGoalId) ?? data.goals[0] ?? null;
@@ -164,6 +178,98 @@ export function GoalTracker() {
     if (selectedGoalId === id) setSelectedGoalId(null);
   }
 
+  function exportGoals(goalIds?: string[]) {
+    const payload = buildGoalExportPayload(
+      data.goals,
+      data.actionCompletions,
+      goalIds,
+    );
+    if (payload.goals.length === 0) {
+      setImportMessage({ type: "error", text: "Nothing to export." });
+      return;
+    }
+    const filename = goalExportFilename(
+      goalIds?.length === 1
+        ? data.goals.find((g) => g.id === goalIds[0])?.title
+        : undefined,
+    );
+    downloadGoalExport(payload, filename);
+    setImportMessage({
+      type: "success",
+      text: `Exported ${payload.goals.length} goal(s) and ${payload.actionCompletions.length} completion(s).`,
+    });
+  }
+
+  function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result;
+      if (typeof text !== "string") {
+        setImportMessage({ type: "error", text: "Could not read file." });
+        return;
+      }
+
+      const parsed = parseGoalExportJson(text);
+      if (!parsed.ok) {
+        setImportMessage({ type: "error", text: parsed.error });
+        return;
+      }
+
+      if (parsed.payload.goals.length === 0) {
+        setImportMessage({ type: "error", text: "File contains no goals." });
+        return;
+      }
+
+      if (importMode === "replace") {
+        const confirmed = window.confirm(
+          "Replace all goals and daily completion history with the imported file? This cannot be undone.",
+        );
+        if (!confirmed) return;
+      }
+
+      const imported = applyGoalImport(
+        parsed.payload,
+        importMode,
+        createId,
+      );
+
+      update((prev) => {
+        if (importMode === "replace") {
+          return {
+            ...prev,
+            goals: imported.goals,
+            actionCompletions: imported.actionCompletions,
+          };
+        }
+        return {
+          ...prev,
+          goals: [...prev.goals, ...imported.goals],
+          actionCompletions: [
+            ...prev.actionCompletions,
+            ...imported.actionCompletions,
+          ],
+        };
+      });
+
+      if (importMode === "merge" && imported.goals.length > 0) {
+        setSelectedGoalId(imported.goals[0].id);
+      }
+
+      setImportMessage({
+        type: "success",
+        text: `Imported ${imported.goals.length} goal(s) and ${imported.actionCompletions.length} completion(s) (${importMode}).`,
+      });
+    };
+    reader.onerror = () => {
+      setImportMessage({ type: "error", text: "Could not read file." });
+    };
+    reader.readAsText(file);
+  }
+
   const goalProgress = useMemo(() => {
     return data.goals.map((goal) => {
       const totalDays = daysBetweenInclusive(goal.startDate, goal.endDate);
@@ -245,6 +351,73 @@ export function GoalTracker() {
         </p>
         <SyncStatus saving={saving} error={error} />
       </div>
+
+      <Card title="Import & export">
+        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+          Back up goals, action items, and daily check-ins as JSON. Import on
+          this device or another account.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => exportGoals()}
+            disabled={data.goals.length === 0}
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            Export all goals
+          </button>
+          <button
+            type="button"
+            onClick={() => selectedGoal && exportGoals([selectedGoal.id])}
+            disabled={!selectedGoal}
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            Export selected goal
+          </button>
+        </div>
+        <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+          <label className="text-sm">
+            <span className="mb-1 block text-zinc-600 dark:text-zinc-400">
+              Import mode
+            </span>
+            <select
+              value={importMode}
+              onChange={(e) =>
+                setImportMode(e.target.value as GoalImportMode)
+              }
+              className="rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800"
+            >
+              <option value="merge">Merge (add to existing)</option>
+              <option value="replace">Replace all goals</option>
+            </select>
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={handleImportFile}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          >
+            Import JSON file
+          </button>
+        </div>
+        {importMessage && (
+          <p
+            className={`mt-3 text-sm ${
+              importMessage.type === "success"
+                ? "text-emerald-700 dark:text-emerald-400"
+                : "text-red-600 dark:text-red-400"
+            }`}
+          >
+            {importMessage.text}
+          </p>
+        )}
+      </Card>
 
       <Card title="Create goal">
         <form onSubmit={addGoal} className="flex flex-wrap gap-3">
