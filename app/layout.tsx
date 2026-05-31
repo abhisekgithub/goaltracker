@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tracker — Spend, Goals & Todos",
+  title: "Tracker — Spend, Goals, Todos & Focus",
   description:
-    "Track monthly budgets and daily spending, goals with daily actions, and todos.",
+    "Track spending, goals, todos, and timed deep-focus sessions with alerts.",
 };
 
 export default function RootLayout({
@@ -30,12 +30,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
+      <body className="flex min-h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
         <Providers>
           <AppNav />
-          <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
-            {children}
-          </main>
+          <main className="main-content">{children}</main>
         </Providers>
       </body>
     </html>

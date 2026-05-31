@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #fafafa;
   --foreground: #171717;
+  --nav-height: 3.5rem;
+  --bottom-nav-height: 4.25rem;
 }
 
 @theme inline {
@@ -14,13 +16,63 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #09090b;
+    --foreground: #fafafa;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .main-content {
+    @apply mx-auto w-full max-w-5xl flex-1 px-4 pt-4 sm:px-6 sm:pt-8;
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+
+  @media (min-width: 768px) {
+    .main-content {
+      padding-bottom: 2rem;
+    }
+  }
+
+  .page-stack {
+    @apply space-y-5 sm:space-y-6;
+  }
+
+  .page-header {
+    @apply mb-1;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50;
+  }
+
+  .page-subtitle {
+    @apply mt-1.5 max-w-2xl text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 active:bg-emerald-800 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-50 active:bg-zinc-100 disabled:pointer-events-none disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800;
+  }
+
+  .input-field {
+    @apply min-h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-base text-zinc-900 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 sm:text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50;
+  }
+
+  .touch-target {
+    @apply min-h-11 min-w-[2.75rem];
+  }
+
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }

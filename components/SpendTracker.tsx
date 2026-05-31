@@ -219,27 +219,25 @@ export function SpendTracker() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            Spend Tracker
-          </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="page-stack">
+      <header className="page-header flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="page-title">Spend Tracker</h1>
+          <p className="page-subtitle">
             Monthly budgets by category, daily spending, and charts.
           </p>
           <SyncStatus saving={saving} error={error} />
         </div>
-        <label className="text-sm">
+        <label className="w-full shrink-0 text-sm sm:w-auto">
           <span className="mb-1 block text-zinc-600 dark:text-zinc-400">Month</span>
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+            className="input-field"
           />
         </label>
-      </div>
+      </header>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="!p-4">

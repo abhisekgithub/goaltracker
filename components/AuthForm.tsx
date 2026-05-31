@@ -65,10 +65,10 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <h1 className="text-2xl font-bold">
+      <h1 className="page-title">
         {mode === "login" ? "Sign in" : "Create account"}
       </h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="page-subtitle">
         {mode === "login"
           ? "Sign in to access your spend, goals, and todos."
           : "Register to save your data in MongoDB."}
@@ -83,7 +83,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoComplete="name"
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+              className="input-field mt-1"
             />
           </label>
         )}
@@ -95,7 +95,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+            className="input-field mt-1"
           />
         </label>
         <label className="block text-sm">
@@ -109,7 +109,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             autoComplete={
               mode === "login" ? "current-password" : "new-password"
             }
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+            className="input-field mt-1"
           />
         </label>
 
@@ -120,7 +120,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+          className="btn-primary w-full"
         >
           {loading
             ? "Please wait…"

@@ -22,46 +22,46 @@ const modules = [
     description: "Task list with optional due dates and filters.",
     color: "border-cyan-200 bg-cyan-50 dark:border-cyan-900 dark:bg-cyan-950/40",
   },
+  {
+    href: "/focus",
+    title: "Deep Focus",
+    description:
+      "15–90 minute sessions with sound and desktop alerts when time is up.",
+    color: "border-violet-200 bg-violet-50 dark:border-violet-900 dark:bg-violet-950/40",
+  },
 ];
 
 export default async function Home() {
   const session = await auth();
 
   return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Personal Tracker
-        </h1>
-        <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-          One app for spending, goals, and todos. Sign in to sync your data to
-          MongoDB. Spend, goals, and todos require an account.
+    <div className="page-stack">
+      <header className="page-header">
+        <h1 className="page-title">Personal Tracker</h1>
+        <p className="page-subtitle">
+          Spending, goals, todos, and focus sessions in one place. Sign in to
+          sync spend, goals, and todos to MongoDB. Focus timer works without an
+          account.
         </p>
       </header>
 
       {!session?.user && (
-        <div className="flex gap-3">
-          <Link
-            href="/login"
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-white dark:border-zinc-700 dark:hover:bg-zinc-900"
-          >
+        <div className="flex flex-wrap gap-3">
+          <Link href="/login" className="btn-secondary">
             Sign in
           </Link>
-          <Link
-            href="/register"
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-          >
+          <Link href="/register" className="btn-primary">
             Create account
           </Link>
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {modules.map((m) => (
           <Link
             key={m.href}
             href={m.href}
-            className={`rounded-xl border p-5 transition-shadow hover:shadow-md ${m.color}`}
+            className={`block rounded-2xl border p-4 transition-shadow active:scale-[0.99] sm:p-5 sm:hover:shadow-md ${m.color}`}
           >
             <h2 className="text-lg font-semibold">{m.title}</h2>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">

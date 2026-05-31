@@ -77,16 +77,14 @@ export function TodoTracker() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          Todo Tracker
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="page-stack">
+      <header className="page-header">
+        <h1 className="page-title">Todo Tracker</h1>
+        <p className="page-subtitle">
           Simple task list with optional due dates.
         </p>
         <SyncStatus saving={saving} error={error} />
-      </div>
+      </header>
 
       <Card>
         <form onSubmit={addTodo} className="flex flex-wrap gap-2">
