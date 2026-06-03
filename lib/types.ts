@@ -46,12 +46,20 @@ export type TodoItem = {
   dueDate?: string;
 };
 
+export type RoutineBlock = {
+  id: string;
+  title: string;
+  startMinutes: number;
+  endMinutes: number;
+};
+
 export type AppData = {
   monthlyBudgets: MonthlyBudget[];
   spendEntries: SpendEntry[];
   goals: Goal[];
   actionCompletions: ActionCompletion[];
   todos: TodoItem[];
+  routineBlocks: RoutineBlock[];
 };
 
 export const EMPTY_APP_DATA: AppData = {
@@ -60,4 +68,5 @@ export const EMPTY_APP_DATA: AppData = {
   goals: [],
   actionCompletions: [],
   todos: [],
+  routineBlocks: [],
 };

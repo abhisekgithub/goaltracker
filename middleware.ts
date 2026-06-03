@@ -11,7 +11,8 @@ export default auth((req) => {
   const isProtected =
     pathname.startsWith("/spend") ||
     pathname.startsWith("/goals") ||
-    pathname.startsWith("/todos");
+    pathname.startsWith("/todos") ||
+    pathname.startsWith("/routine");
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -29,6 +30,7 @@ export const config = {
     "/spend/:path*",
     "/goals/:path*",
     "/todos/:path*",
+    "/routine/:path*",
     "/login",
     "/register",
   ],

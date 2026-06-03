@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tracker — Spend, Goals, Todos & Focus",
   description:
-    "Track spending, goals, todos, and timed deep-focus sessions with alerts.",
+    "Track spending, goals, todos, daily routines, and timed focus sessions.",
 };
 
 export default function RootLayout({

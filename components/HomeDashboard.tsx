@@ -1,8 +1,16 @@
-import Link from "next/link";
-import { auth } from "@/auth";
-import { HomeDashboard } from "@/components/HomeDashboard";
+"use client";
 
-const guestModules = [
+import Link from "next/link";
+import { RoutineNowBanner } from "./RoutineNowBanner";
+
+const modules = [
+  {
+    href: "/routine",
+    title: "Daily Routine",
+    description:
+      "Time blocks from morning to night. See what you should be doing now.",
+    color: "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40",
+  },
   {
     href: "/spend",
     title: "Spend Tracker",
@@ -32,34 +40,20 @@ const guestModules = [
   },
 ];
 
-export default async function Home() {
-  const session = await auth();
-
-  if (session?.user) {
-    return <HomeDashboard />;
-  }
-
+export function HomeDashboard() {
   return (
     <div className="page-stack">
       <header className="page-header">
         <h1 className="page-title">Personal Tracker</h1>
         <p className="page-subtitle">
-          Spending, goals, todos, routines, and focus sessions in one place. Sign
-          in to sync your data to MongoDB. Focus timer works without an account.
+          Welcome back. Here&apos;s your day at a glance — open any module below.
         </p>
       </header>
 
-      <div className="flex flex-wrap gap-3">
-        <Link href="/login" className="btn-secondary">
-          Sign in
-        </Link>
-        <Link href="/register" className="btn-primary">
-          Create account
-        </Link>
-      </div>
+      <RoutineNowBanner />
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-        {guestModules.map((m) => (
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        {modules.map((m) => (
           <Link
             key={m.href}
             href={m.href}

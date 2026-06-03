@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { RoutineNowBanner } from "./RoutineNowBanner";
 
 const links = [
   { href: "/", label: "Home", short: "Home" },
+  { href: "/routine", label: "Routine", short: "Day" },
   { href: "/spend", label: "Spend", short: "Spend" },
   { href: "/goals", label: "Goals", short: "Goals" },
   { href: "/todos", label: "Todos", short: "Todos" },
@@ -58,14 +60,21 @@ export function AppNav() {
     <>
       {/* Mobile top bar */}
       <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur-md md:hidden dark:border-zinc-800 dark:bg-zinc-950/95">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-2 px-4">
-          <Link
-            href="/"
-            className="text-sm font-semibold tracking-tight text-emerald-700 dark:text-emerald-400"
-          >
-            Tracker
-          </Link>
-          <div className="flex items-center gap-2">{authBlock}</div>
+        <div className="mx-auto max-w-5xl px-4 py-2">
+          <div className="flex h-10 items-center justify-between gap-2">
+            <Link
+              href="/"
+              className="text-sm font-semibold tracking-tight text-emerald-700 dark:text-emerald-400"
+            >
+              Tracker
+            </Link>
+            <div className="flex items-center gap-2">{authBlock}</div>
+          </div>
+          {session?.user && (
+            <div className="pb-1">
+              <RoutineNowBanner compact />
+            </div>
+          )}
         </div>
       </header>
 
@@ -100,7 +109,7 @@ export function AppNav() {
         className="bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 backdrop-blur-md md:hidden dark:border-zinc-800 dark:bg-zinc-950/95"
         aria-label="Main"
       >
-        <div className="mx-auto grid h-[var(--bottom-nav-height)] max-w-lg grid-cols-5">
+        <div className="mx-auto grid h-[var(--bottom-nav-height)] max-w-lg grid-cols-6">
           {links.map(({ href, short }) => {
             const active = isActive(pathname, href);
             return (

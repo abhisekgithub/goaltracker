@@ -13,7 +13,8 @@ function isAppData(value: unknown): value is AppData {
     Array.isArray(v.spendEntries) &&
     Array.isArray(v.goals) &&
     Array.isArray(v.actionCompletions) &&
-    Array.isArray(v.todos)
+    Array.isArray(v.todos) &&
+    Array.isArray(v.routineBlocks)
   );
 }
 
